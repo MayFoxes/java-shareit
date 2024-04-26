@@ -13,5 +13,5 @@ public class Booking {
     private Date end;
     private ItemDto item;
     private User booker;
-    private bookingStatus status;
+    private BookingStatus status;
 }
