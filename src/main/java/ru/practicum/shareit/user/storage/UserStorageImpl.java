@@ -64,10 +64,10 @@ public class UserStorageImpl implements UserStorage {
         if (user.getEmail() == null) {
             return;
         }
-        for (Long uId : userMap.keySet()) {
-            if (user.getEmail().equals(userMap.get(uId).getEmail()) && !uId.equals(id)) {
-                throw new AlreadyExistsException("Email already exist");
-            }
+        if (userMap.values().stream()
+                .filter(i -> !i.getId().equals(id))
+                .anyMatch(e -> user.getEmail().equals(e.getEmail()))) {
+            throw new AlreadyExistsException("Email already exist");
         }
     }
 }

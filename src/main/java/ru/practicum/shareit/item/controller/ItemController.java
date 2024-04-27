@@ -22,7 +22,7 @@ public class ItemController {
     @PostMapping
     public ItemDto saveItem(@RequestHeader("X-Sharer-User-Id") Long ownerId, @Valid @RequestBody ItemDto itemDto) {
         Item tempItem = itemService.saveItem(ownerId, itemDto);
-        log.info("A try to create a new item:{} by {}", tempItem, ownerId);
+        log.info("A try to create a new item with id:{} by user with id:{}", tempItem, ownerId);
         return ItemMapper.toItemDto(tempItem);
     }
 
@@ -34,8 +34,8 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> findItemsByName(@RequestParam(name = "text") String text) {
-        log.info("User search item by name");
+    public List<ItemDto> findItemsByName(@RequestParam String text) {
+        log.info("User search item by name:{}", text);
         return itemService.findItemsByName(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -51,7 +51,7 @@ public class ItemController {
 
     @PatchMapping(path = "/{itemId}")
     public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long ownerId, @PathVariable Long itemId, @RequestBody ItemDto changes) {
-        log.info("User:{} trying to update a item:{}", ownerId, itemId);
+        log.info("User with id:{} trying to update a item with id:{}", ownerId, itemId);
         Item tempItem = itemService.updateItem(ownerId, itemId, changes);
         return ItemMapper.toItemDto(tempItem);
     }

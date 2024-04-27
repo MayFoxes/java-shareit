@@ -25,19 +25,19 @@ public class UserController {
 
     @DeleteMapping(path = "/{userId}")
     public void deleteUser(@Valid @PathVariable Long userId) {
-        log.info("A try to delete a user:{}", userId);
+        log.info("A try to delete a user with id:{}", userId);
         userService.deleteUser(userId);
     }
 
     @PatchMapping(path = "/{userId}")
     public User updateUser(@Valid @PathVariable Long userId, @RequestBody User user) {
-        log.info("User{} trying to update themself", userId);
+        log.info("User with id:{} trying to update themself", userId);
         return userService.updatedUser(userId, user);
     }
 
     @GetMapping(path = "/{userId}")
     public User findUser(@Valid @PathVariable Long userId) {
-        log.info("Searching user:{}", userId);
+        log.info("Searching user with id:{}", userId);
         return userService.findUserById(userId);
     }
 
