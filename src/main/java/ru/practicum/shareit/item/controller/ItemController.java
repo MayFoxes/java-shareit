@@ -19,18 +19,19 @@ import java.util.List;
 @Slf4j
 public class ItemController {
     private final ItemService itemService;
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public Item saveItem(@RequestHeader("X-Sharer-User-Id") Long ownerId,
-                         @Valid @RequestBody ItemDto itemDto) {
+    public Item saveItem(
+            @RequestHeader(USER_ID_HEADER) Long ownerId, @Valid @RequestBody ItemDto itemDto) {
         Item tempItem = itemService.saveItem(ownerId, itemDto);
         log.info("A try to create a new item with id:{} by user with id:{}", tempItem, ownerId);
         return tempItem;
     }
 
     @GetMapping(path = "/{itemId}")
-    public ItemExtendedDto findItemById(@RequestHeader("X-Sharer-User-Id") Long ownerId,
-                                        @PathVariable Long itemId) {
+    public ItemExtendedDto findItemById(
+            @RequestHeader(USER_ID_HEADER) Long ownerId, @PathVariable Long itemId) {
         log.info("User requested item by id:{}", itemId);
         return itemService.findItemById(ownerId, itemId);
     }
@@ -42,15 +43,16 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemExtendedDto> findItemByOwner(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public List<ItemExtendedDto> findItemByOwner(@RequestHeader(USER_ID_HEADER) Long ownerId) {
         log.info("User search their items");
         return itemService.findItemsByOwner(ownerId);
     }
 
     @PatchMapping(path = "/{itemId}")
-    public ItemExtendedDto updateItem(@RequestHeader("X-Sharer-User-Id") Long ownerId,
-                                      @PathVariable Long itemId,
-                                      @RequestBody ItemDto changes) {
+    public ItemExtendedDto updateItem(
+            @RequestHeader(USER_ID_HEADER) Long ownerId,
+            @PathVariable Long itemId,
+            @RequestBody ItemDto changes) {
         log.info("User with id:{} trying to update a item with id:{}", ownerId, itemId);
         return itemService.updateItem(ownerId, itemId, changes);
     }
@@ -59,8 +61,7 @@ public class ItemController {
     public CommentExtendedDto createComment(
             @RequestBody @Valid CommentDto commentDto,
             @PathVariable Long itemId,
-            @RequestHeader("X-Sharer-User-Id") Long userId
-    ) {
+            @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("Request to create comment.");
         return itemService.createComment(commentDto, itemId, userId);
     }

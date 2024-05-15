@@ -19,33 +19,34 @@ import java.util.List;
 @Slf4j
 public class BookingController {
     private final BookingService bookingService;
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public BookingExtendedDto createBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingExtendedDto createBooking(@RequestHeader(USER_ID_HEADER) Long userId,
                                             @Valid @RequestBody BookingDto bookingDto) {
         log.info("Request to create booking.");
         return bookingService.createBooking(bookingDto, userId);
     }
 
     @PatchMapping("/{bookingId}")
-    public Booking approveBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public Booking approveBooking(@RequestHeader(USER_ID_HEADER) Long userId,
                                   @PathVariable Long bookingId,
-                                  @RequestParam(required = true) boolean approved) {
+                                  @RequestParam boolean approved) {
         log.info("Request to approve booking.");
         return bookingService.approveOrRejectBooking(bookingId, userId, approved);
     }
 
 
     @GetMapping("/{bookingId}")
-    public BookingExtendedDto findBookingById(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingExtendedDto findBookingById(@RequestHeader(USER_ID_HEADER) Long userId,
                                               @PathVariable Long bookingId) {
         log.info("Request to receive booking:{}.", bookingId);
         return bookingService.getBookingById(bookingId, userId);
     }
 
     @GetMapping
-    public List<BookingExtendedDto> findUserBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                     @RequestParam(required = false, defaultValue = "ALL") String state) {
+    public List<BookingExtendedDto> findUserBookings(@RequestHeader(USER_ID_HEADER) Long userId,
+                                                     @RequestParam(defaultValue = "ALL") String state) {
         log.info("Request to receive user:{} bookings.", userId);
         try {
             return bookingService.getUserBookings(userId, BookingState.valueOf(state));
@@ -55,8 +56,8 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingExtendedDto> findByItemOwnerBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                            @RequestParam(required = false, defaultValue = "ALL") String state) {
+    public List<BookingExtendedDto> findByItemOwnerBookings(@RequestHeader(USER_ID_HEADER) Long userId,
+                                                            @RequestParam(defaultValue = "ALL") String state) {
         log.info("Request to receive item owner:{} bookings.", userId);
         try {
             return bookingService.getItemOwnerBookings(userId, BookingState.valueOf(state));
@@ -64,5 +65,4 @@ public class BookingController {
             throw new UnsupportedStateException("Unknown state: " + state);
         }
     }
-
 }

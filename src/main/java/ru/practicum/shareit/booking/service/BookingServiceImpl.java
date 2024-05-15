@@ -38,10 +38,12 @@ public class BookingServiceImpl implements BookingService {
         User user = getUserById(owner);
         Item item = getItemById(bookingDto.getItemId());
 
-        if (item.getOwner().equals(owner))
+        if (item.getOwner().equals(owner)) {
             throw new NotFoundException("Booker can not be an item owner.");
-        if (!item.getAvailable())
+        }
+        if (!item.getAvailable()) {
             throw new ValidationException(String.format("Item:%d is unavailable.", item.getId()));
+        }
 
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.setItem(item);
@@ -52,13 +54,18 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingExtendedDto getBookingById(Long bookingId, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException(String.format("Booking:%d is not found.", bookingId)));
+        Booking booking =
+                bookingRepository
+                        .findById(bookingId)
+                        .orElseThrow(
+                                () -> new NotFoundException(String.format("Booking:%d is not found.", bookingId)));
         boolean isUserBooker = booking.getBooker().getId().equals(userId);
         boolean isUserItemOwner = booking.getItem().getOwner().equals(userId);
 
-        if (!isUserBooker && !isUserItemOwner)
-            throw new NotFoundException(String.format("User:%d is not a booker Or a owner of booking:%d.", userId, bookingId));
+        if (!isUserBooker && !isUserItemOwner) {
+            throw new NotFoundException(
+                    String.format("User:%d is not a booker Or a owner of booking:%d.", userId, bookingId));
+        }
 
         return BookingMapper.toBookingExtendedDto(booking);
     }
@@ -76,15 +83,14 @@ public class BookingServiceImpl implements BookingService {
                 BookingStatus status = BookingStatus.valueOf(state.name());
                 bookings = bookingRepository.findAllByBookerIdAndStatus(userId, status, sort);
             } catch (IllegalArgumentException e) {
-                bookings = bookingRepository.findAllByBookerId(userId, sort).stream()
-                        .filter(getFilterByState(state))
-                        .collect(Collectors.toList());
+                bookings =
+                        bookingRepository.findAllByBookerId(userId, sort).stream()
+                                .filter(getFilterByState(state))
+                                .collect(Collectors.toList());
             }
         }
 
-        return bookings.stream()
-                .map(BookingMapper::toBookingExtendedDto)
-                .collect(Collectors.toList());
+        return bookings.stream().map(BookingMapper::toBookingExtendedDto).collect(Collectors.toList());
     }
 
     @Override
@@ -100,15 +106,14 @@ public class BookingServiceImpl implements BookingService {
                 BookingStatus status = BookingStatus.valueOf(state.name());
                 bookings = bookingRepository.findAllByItemOwnerAndStatus(ownerId, status, sort);
             } catch (IllegalArgumentException e) {
-                bookings = bookingRepository.findAllByItemOwner(ownerId, sort).stream()
-                        .filter(getFilterByState(state))
-                        .collect(Collectors.toList());
+                bookings =
+                        bookingRepository.findAllByItemOwner(ownerId, sort).stream()
+                                .filter(getFilterByState(state))
+                                .collect(Collectors.toList());
             }
         }
 
-        return bookings.stream()
-                .map(BookingMapper::toBookingExtendedDto)
-                .collect(Collectors.toList());
+        return bookings.stream().map(BookingMapper::toBookingExtendedDto).collect(Collectors.toList());
     }
 
     @Transactional
@@ -116,46 +121,48 @@ public class BookingServiceImpl implements BookingService {
     public Booking approveOrRejectBooking(Long bookingId, Long itemOwnerId, Boolean approved) {
         Booking booking = getBookingById(bookingId);
 
-        if (!booking.getItem().getOwner().equals(itemOwnerId))
+        if (!booking.getItem().getOwner().equals(itemOwnerId)) {
             throw new NotFoundException("Booker can not be an item owner.");
-        if (booking.getStatus().equals(BookingStatus.APPROVED))
-            throw new ValidationException(String.format("Booking %d is already approved.", bookingId));
-
-        if (approved) {
-            booking.setStatus(BookingStatus.APPROVED);
-        } else {
-            booking.setStatus(BookingStatus.REJECTED);
         }
+
+        if (booking.getStatus().equals(BookingStatus.APPROVED)) {
+            throw new ValidationException(String.format("Booking %d is already approved.", bookingId));
+        }
+
+        booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
 
         return bookingRepository.save(booking);
     }
 
     private User getUserById(Long userId) {
-        return userRepository.findById(userId)
+        return userRepository
+                .findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User:%d does not exist.", userId)));
     }
 
     private Item getItemById(Long itemId) {
-        return itemRepository.findById(itemId)
+        return itemRepository
+                .findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item:%d is not exist.", itemId)));
     }
 
     private Booking getBookingById(Long bookingId) {
-        return bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException(String.format("Booking:%d is not found.", bookingId)));
+        return bookingRepository
+                .findById(bookingId)
+                .orElseThrow(
+                        () -> new NotFoundException(String.format("Booking:%d is not found.", bookingId)));
     }
 
     private Predicate<Booking> getFilterByState(BookingState state) {
         switch (state) {
             case PAST:
-                return booking ->
-                        booking.getEnd().isBefore(LocalDateTime.now());
+                return booking -> booking.getEnd().isBefore(LocalDateTime.now());
             case CURRENT:
                 return booking ->
-                        booking.getStart().isBefore(LocalDateTime.now()) && booking.getEnd().isAfter(LocalDateTime.now());
+                        booking.getStart().isBefore(LocalDateTime.now())
+                                && booking.getEnd().isAfter(LocalDateTime.now());
             case FUTURE:
-                return booking ->
-                        booking.getStart().isAfter(LocalDateTime.now());
+                return booking -> booking.getStart().isAfter(LocalDateTime.now());
             default:
                 throw new ValidationException("Provided wrong state of booking.");
         }

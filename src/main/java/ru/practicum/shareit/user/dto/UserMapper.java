@@ -1,11 +1,10 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.model.User;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public class UserMapper {
     public static UserDto toUserDto(User user) {
         return UserDto.builder()
@@ -14,7 +13,7 @@ public class UserMapper {
                 .email(user.getEmail()).build();
     }
 
-    public static User toUser(UserDto userDto) {
+    public User toUser(UserDto userDto) {
         if (userDto.getEmail() == null || userDto.getEmail().isEmpty()) {
             throw new ValidationException("Email can not be empty!");
         }
@@ -27,7 +26,7 @@ public class UserMapper {
                 .email(userDto.getEmail()).build();
     }
 
-    public static User fromUserAndDto(User user, UserDto userDto) {
+    public User fromUserAndDto(User user, UserDto userDto) {
         return User.builder()
                 .id(user.getId())
                 .name(userDto.getName() == null ? user.getName() : userDto.getName())

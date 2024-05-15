@@ -20,14 +20,18 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "START_TIME", nullable = false)
     private LocalDateTime start;
+
     @Column(name = "END_TIME", nullable = false)
     private LocalDateTime end;
+
     @ManyToOne
     private Item item;
     @ManyToOne
     private User booker;
+
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 }
