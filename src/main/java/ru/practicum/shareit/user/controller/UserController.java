@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -18,9 +19,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
+    public User createUser(@Valid @RequestBody UserDto userDto) {
         log.info("A try to create a new user");
-        return userService.createUser(user);
+        return userService.createUser(userDto);
     }
 
     @DeleteMapping(path = "/{userId}")
@@ -30,19 +31,19 @@ public class UserController {
     }
 
     @PatchMapping(path = "/{userId}")
-    public User updateUser(@Valid @PathVariable Long userId, @RequestBody User user) {
+    public User updateUser(@PathVariable Long userId, @Valid @RequestBody UserDto userDto) {
         log.info("User with id:{} trying to update themself", userId);
-        return userService.updatedUser(userId, user);
+        return userService.updatedUser(userId, userDto);
     }
 
     @GetMapping(path = "/{userId}")
-    public User findUser(@Valid @PathVariable Long userId) {
+    public UserDto findUser(@Valid @PathVariable Long userId) {
         log.info("Searching user with id:{}", userId);
         return userService.findUserById(userId);
     }
 
     @GetMapping
-    public List<User> findAllUsers() {
+    public List<UserDto> findAllUsers() {
         log.info("Searching all users");
         return userService.findAllUsers();
     }
