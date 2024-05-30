@@ -11,6 +11,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.dto.CommentMapper;
 import ru.practicum.shareit.comment.model.Comment;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -209,4 +211,84 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.authorName", is(comment.getAuthorName())))
                 .andExpect(jsonPath("$.user.id", is(comment.getUser().getId()), Long.class));
     }
+
+    @SneakyThrows
+    @Test
+    void updateItemValidationFailedTest() {
+        itemDto = ItemDto.builder()
+                .name("name")
+                .description("description")
+                .available(true)
+                .build();
+        item = ItemMapper.toItem(itemDto);
+
+        when(itemService.updateItem(anyLong(), anyLong(), any(ItemDto.class)))
+                .thenThrow(ValidationException.class);
+        when(itemService.findItemById(anyLong(), anyLong()))
+                .thenAnswer(invocationOnMock -> {
+                    throw new ValidationException("");
+                });
+
+        mvc.perform(patch("/items/1")
+                        .content(objectMapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().isBadRequest());
+    }
+
+    @SneakyThrows
+    @Test
+    void updateItemNoAccessTest() {
+        itemDto = ItemDto.builder()
+                .name("name")
+                .description("description")
+                .available(true)
+                .build();
+        item = ItemMapper.toItem(itemDto);
+
+        when(itemService.updateItem(anyLong(), anyLong(), any(ItemDto.class)))
+                .thenThrow(NotFoundException.class);
+        when(itemService.findItemById(anyLong(), anyLong()))
+                .thenAnswer(invocationOnMock -> {
+                    throw new NotFoundException("Error");
+                });
+
+        mvc.perform(patch("/items/1")
+                        .content(objectMapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @SneakyThrows
+    @Test
+    void updateItemNotFoundTest() {
+        itemDto = ItemDto.builder()
+                .name("name")
+                .description("description")
+                .available(true)
+                .build();
+        item = ItemMapper.toItem(itemDto);
+
+        when(itemService.updateItem(anyLong(), anyLong(), any(ItemDto.class)))
+                .thenThrow(NotFoundException.class);
+        when(itemService.findItemById(anyLong(), anyLong()))
+                .thenAnswer(invocationOnMock -> {
+                    throw new NotFoundException("Error");
+                });
+
+        mvc.perform(patch("/items/1")
+                        .content(objectMapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().isNotFound());
+    }
+
+
 }
