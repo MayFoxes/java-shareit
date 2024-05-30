@@ -17,6 +17,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.dto.CommentMapper;
+import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.comment.repository.CommentRepository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -29,6 +30,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -314,5 +316,101 @@ public class ItemServiceTest {
         assertThrows(
                 NotFoundException.class, () -> itemService.createComment(comment, item.getId(), comment.getUser())
         );
+    }
+
+    @Test
+    void createCommentTest() {
+        user = User.builder()
+                .id(1L)
+                .name("username")
+                .email("asd@mail.ru")
+                .build();
+        item = Item.builder()
+                .id(1L)
+                .name("itemname")
+                .description("description")
+                .available(true)
+                .owner(User.builder()
+                        .id(2L)
+                        .name("user2")
+                        .email("email2@mail.ru")
+                        .build().getId()).build();
+        CommentDto commentDto = CommentDto.builder()
+                .id(1L)
+                .text("good")
+                .created(LocalDateTime.now())
+                .user(user.getId())
+                .item(item.getId()).build();
+        Comment comment = CommentMapper.toComment(commentDto);
+        comment.setUser(user);
+        comment.setAuthorName(user.getName());
+        comment.setItem(item);
+        Booking booking = Booking.builder()
+                .id(1L)
+                .booker(user)
+                .start(LocalDateTime.now().minusHours(2))
+                .end(LocalDateTime.now())
+                .item(item)
+                .status(BookingStatus.APPROVED)
+                .build();
+
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
+        when(bookingRepository.findAllByBookerId(any(Long.class), any(Sort.class)))
+                .thenReturn(List.of(booking));
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(item));
+        when(commentRepository.save(comment))
+                .thenReturn(comment);
+
+        assertEquals(CommentMapper.toCommentDto(comment), itemService.createComment(commentDto, item.getId(), commentDto.getUser()));
+    }
+
+    @Test
+    void getItemTest() {
+        item = Item.builder()
+                .id(1L)
+                .name("itemname")
+                .description("description")
+                .available(true)
+                .owner(1L)
+                .build();
+        ItemExtendedDto tempItem = ItemMapper.toItemDto(item);
+        tempItem.setComments(new ArrayList<>());
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(item));
+
+        ItemExtendedDto actual = itemService.findItemById(1L, 1L);
+
+        assertEquals(tempItem, actual);
+    }
+
+    @Test
+    void createItemTest() {
+        user = User.builder()
+                .id(1L)
+                .name("username")
+                .email("asd@mail.ru")
+                .build();
+        itemDto = ItemDto.builder()
+                .id(1L)
+                .name("itemname")
+                .description("description")
+                .available(true)
+                .owner(user.getId()).build();
+        item = ItemMapper.toItem(itemDto);
+        when(itemRepository.save(item))
+                .thenReturn(item);
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
+
+        Item expected = Item.builder()
+                .id(1L)
+                .name("itemname")
+                .description("description")
+                .available(true)
+                .owner(user.getId()).build();
+
+        assertEquals(ItemMapper.toItemDto(expected), itemService.saveItem(user.getId(), itemDto));
     }
 }

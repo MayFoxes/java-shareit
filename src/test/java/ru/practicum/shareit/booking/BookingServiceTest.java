@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.ShareItApp;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -27,6 +28,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -323,5 +325,95 @@ public class BookingServiceTest {
         Booking result = bookingService.approveOrRejectBooking(booking.getId(), user1.getId(), false);
 
         assertEquals(BookingStatus.REJECTED, result.getStatus());
+    }
+
+    @Test
+    void getBookingsOfItemOwnerTest() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user1));
+        when(bookingRepository.findAllByItemOwner(anyLong(), any(Pageable.class)))
+                .thenReturn(List.of(booking));
+
+        BookingExtendedDto result = bookingService.getItemOwnerBookings(1L, BookingState.ALL, 0, 10).get(0);
+
+        assertEquals(booking.getId(), result.getId());
+        assertEquals(booking.getStart(), result.getStart());
+        assertEquals(booking.getEnd(), result.getEnd());
+        assertEquals(booking.getStatus(), result.getStatus());
+        assertEquals(user2, result.getBooker());
+        assertEquals(item1, result.getItem());
+    }
+
+    @Test
+    void getBookingsOfItemOwnerByCurrentStateTest() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user1));
+        booking.setStart(LocalDateTime.now().minusHours(1));
+        when(bookingRepository.findAllByItemOwner(anyLong(), any(Pageable.class)))
+                .thenReturn(List.of(booking));
+
+        BookingExtendedDto result = bookingService
+                .getItemOwnerBookings(1L, BookingState.CURRENT, 0, 10).get(0);
+
+        assertEquals(booking.getId(), result.getId());
+        assertEquals(booking.getStart(), result.getStart());
+        assertEquals(booking.getEnd(), result.getEnd());
+        assertEquals(booking.getStatus(), result.getStatus());
+        assertEquals(user2, result.getBooker());
+        assertEquals(item1, result.getItem());
+    }
+
+    @Test
+    void getBookingsOfBookerByWaitingState() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user2));
+        when(bookingRepository.findAllByBookerIdAndStatus(anyLong(), any(), any(Pageable.class)))
+                .thenReturn(List.of(booking));
+
+        BookingExtendedDto result = bookingService
+                .getUserBookings(2L, BookingState.WAITING, 0, 10).get(0);
+
+        assertEquals(booking.getId(), result.getId());
+        assertEquals(booking.getStart(), result.getStart());
+        assertEquals(booking.getEnd(), result.getEnd());
+        assertEquals(booking.getStatus(), result.getStatus());
+        assertEquals(user2, result.getBooker());
+        assertEquals(item1, result.getItem());
+    }
+
+    @Test
+    void getBookingsOfBookerTest() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user2));
+        when(bookingRepository.findAllByBookerId(anyLong(), any(Pageable.class)))
+                .thenReturn(List.of(booking));
+
+        BookingExtendedDto result = bookingService
+                .getUserBookings(2L, BookingState.ALL, 0, 10).get(0);
+
+        assertEquals(booking.getId(), result.getId());
+        assertEquals(booking.getStart(), result.getStart());
+        assertEquals(booking.getEnd(), result.getEnd());
+        assertEquals(booking.getStatus(), result.getStatus());
+        assertEquals(user2, result.getBooker());
+        assertEquals(item1, result.getItem());
+    }
+
+    @Test
+    void getBookingsOfItemOwnerByWaitingStateTest() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user1));
+        when(bookingRepository.findAllByItemOwnerAndStatus(anyLong(), any(), any(Pageable.class)))
+                .thenReturn(List.of(booking));
+
+        BookingExtendedDto result = bookingService
+                .getItemOwnerBookings(1L, BookingState.WAITING, 0, 10).get(0);
+
+        assertEquals(booking.getId(), result.getId());
+        assertEquals(booking.getStart(), result.getStart());
+        assertEquals(booking.getEnd(), result.getEnd());
+        assertEquals(booking.getStatus(), result.getStatus());
+        assertEquals(user2, result.getBooker());
+        assertEquals(item1, result.getItem());
     }
 }

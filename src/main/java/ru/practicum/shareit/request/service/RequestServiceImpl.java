@@ -17,7 +17,6 @@ import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +34,6 @@ public class RequestServiceImpl implements RequestService {
     public Request createRequest(Long userId, RequestDto requestDto) {
         User tempUser = checkUserExist(userId);
         Request tempRequest = RequestMapper.toRequest(requestDto);
-        tempRequest.setCreated(LocalDateTime.now());
         tempRequest.setUser(tempUser);
 
         return requestRepository.save(tempRequest);
@@ -85,8 +83,8 @@ public class RequestServiceImpl implements RequestService {
 
         for (Request request : requests) {
             RequestExtendedDto requestExtendedDto = RequestMapper.toExtendedRequest(request);
-            requestExtendedDto.setItems(itemRepository.findAllByRequest(request)
-                    .stream().map(ItemMapper::toItemDto)
+            requestExtendedDto.setItems(itemRepository.findAllByRequest(request).stream()
+                    .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList()));
 
             listOfRequests.add(requestExtendedDto);

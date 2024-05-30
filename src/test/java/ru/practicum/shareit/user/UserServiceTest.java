@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.ShareItApp;
+import ru.practicum.shareit.exception.EmailUniqueException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -14,6 +15,8 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -67,11 +70,24 @@ public class UserServiceTest {
 
     @Test
     void getAllTest() {
-        userService.createUser(user);
-        List<UserDto> expected = List.of(user);
+        User tempUser = userService.createUser(user);
+        List<UserDto> expected = Stream.of(tempUser)
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
 
         List<UserDto> actual = userService.findAllUsers();
 
         assertIterableEquals(expected, actual);
+    }
+
+    @Test
+    void createUserNonUniqueEmailTest() {
+        userService.createUser(user);
+        UserDto sameEmailUser = UserDto.builder()
+                .name("name5")
+                .email(user.getEmail())
+                .build();
+        EmailUniqueException e = assertThrows(EmailUniqueException.class, () -> userService.createUser(sameEmailUser));
+        assertEquals("Email:email@mail.ru is not unique.", e.getMessage());
     }
 }

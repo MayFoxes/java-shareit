@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.booking.service.Pagination;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.dto.CommentExtendedDto;
 import ru.practicum.shareit.comment.dto.CommentMapper;
@@ -26,7 +27,6 @@ import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.booking.service.Pagination;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -143,7 +143,6 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public CommentExtendedDto createComment(CommentDto commentDto, Long itemId, Long userId) {
-        commentDto.setCreated(LocalDateTime.now());
         User user = getUserById(userId);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "start");

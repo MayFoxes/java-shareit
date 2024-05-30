@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.ShareItApp;
@@ -17,6 +18,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.dto.RequestExtendedDto;
 import ru.practicum.shareit.request.dto.RequestMapper;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.request.service.RequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
@@ -28,8 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -41,19 +42,15 @@ import static org.mockito.Mockito.when;
 public class RequestServiceTest {
     @Mock
     private ItemRepository itemRepository;
-
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private RequestRepository requestRepository;
-
     @InjectMocks
     private RequestServiceImpl requestService;
-
     private User user;
-
     private RequestDto requestDto;
+    private Request request;
 
     @Test
     void createRequestUserNotFoundTest() {
@@ -172,5 +169,75 @@ public class RequestServiceTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> requestService.findRequestById(1L, 1L));
+    }
+
+    @Test
+    void getAllTest() {
+        user = User.builder()
+                .id(1L)
+                .name("name")
+                .email("email@mail.ru")
+                .build();
+        requestDto = RequestDto.builder()
+                .id(1L)
+                .description("desc")
+                .build();
+        request = RequestMapper.toRequest(requestDto);
+        request.setUser(user);
+
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
+        when(itemRepository.findAllByRequest(request))
+                .thenReturn(List.of(Item.builder()
+                        .owner(user.getId())
+                        .available(true)
+                        .name("name")
+                        .request(request)
+                        .owner(user.getId()).build()));
+
+        when(requestRepository.findAllByUserIdNot(anyLong(), any(Pageable.class)))
+                .thenReturn(List.of(request));
+
+        List<RequestExtendedDto> expected = Stream.of(request)
+                .map(RequestMapper::toExtendedRequest)
+                .collect(Collectors.toList());
+        expected.get(0).setItems(Stream.of(Item.builder()
+                        .owner(user.getId())
+                        .available(true)
+                        .name("name")
+                        .request(request)
+                        .owner(user.getId()).build())
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList()));
+        requestRepository.findAll();
+
+        List<RequestExtendedDto> actual = requestService.findAllRequests(1L, 0, 10);
+
+        assertIterableEquals(expected, actual);
+    }
+
+    @Test
+    void createItemRequestTest() {
+        user = User.builder()
+                .id(1L)
+                .name("name")
+                .email("email@mail.ru")
+                .build();
+        requestDto = RequestDto.builder()
+                .description("desc")
+                .created(LocalDateTime.now())
+                .build();
+        request = RequestMapper.toRequest(requestDto);
+        request.setUser(user);
+
+        when(requestRepository.save(request))
+                .thenReturn(request);
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
+
+        RequestExtendedDto expected = RequestMapper.toExtendedRequest(request);
+        Request actual = requestService.createRequest(user.getId(), requestDto);
+
+        assertEquals(expected, RequestMapper.toExtendedRequest(actual));
     }
 }
