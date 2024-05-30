@@ -54,8 +54,6 @@ public class BookingControllerTest {
     private UserDto user;
     private BookingDto createBooking;
     private Booking booking;
-    private final static Integer size = 10;
-    private final static Integer from = 0;
 
     @BeforeEach
     void setUp() {

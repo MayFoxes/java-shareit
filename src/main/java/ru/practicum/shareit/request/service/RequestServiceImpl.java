@@ -33,10 +33,10 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     @Override
     public Request createRequest(Long userId, RequestDto requestDto) {
-        User TempUser = checkUserExist(userId);
+        User tempUser = checkUserExist(userId);
         Request tempRequest = RequestMapper.toRequest(requestDto);
         tempRequest.setCreated(LocalDateTime.now());
-        tempRequest.setUser(TempUser);
+        tempRequest.setUser(tempUser);
 
         return requestRepository.save(tempRequest);
     }

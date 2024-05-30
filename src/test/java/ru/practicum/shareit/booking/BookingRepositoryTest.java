@@ -83,7 +83,7 @@ public class BookingRepositoryTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllByBookerWithPaginationTest() {
+    void getAllByBookerTest() {
         Booking received = bookingRepository.findAllByBookerId(user2.getId(), sort).get(0);
 
         assertEquals(booking.getId(), received.getId());
@@ -96,7 +96,7 @@ public class BookingRepositoryTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllByBookerAndStatusWithPaginationTest() {
+    void getAllByBookerAndStatusTest() {
         Booking received = bookingRepository.findAllByBookerIdAndStatus(user2.getId(), BookingStatus.APPROVED, sort).get(0);
 
         assertEquals(booking.getId(), received.getId());
@@ -109,7 +109,7 @@ public class BookingRepositoryTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllByItemOwnerWithPaginationTest() {
+    void getAllByItemOwnerTest() {
         Booking received = bookingRepository.findAllByItemOwner(user2.getId(), sort).get(0);
 
         assertEquals(booking.getId(), received.getId());
@@ -122,7 +122,7 @@ public class BookingRepositoryTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getAllByItemOwnerAndStatusWithPaginationTest() {
+    void getAllByItemOwnerAndStatusTest() {
         Booking received = bookingRepository.findAllByItemOwnerAndStatus(user2.getId(), BookingStatus.APPROVED, sort).get(0);
 
         assertEquals(booking.getId(), received.getId());

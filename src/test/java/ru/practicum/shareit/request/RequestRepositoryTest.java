@@ -62,8 +62,8 @@ public class RequestRepositoryTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getAllByCreatorNotIn() {
-        Request received = requestRepository.
-                findAllByUserIdNot(2L, PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "id")))
+        Request received = requestRepository
+                .findAllByUserIdNot(2L, PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "id")))
                 .get(0);
 
         assertEquals(request.getId(), received.getId());

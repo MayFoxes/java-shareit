@@ -26,7 +26,7 @@ import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.utility.Pagination;
+import ru.practicum.shareit.booking.service.Pagination;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
