@@ -83,6 +83,7 @@ public class RequestServiceTest {
         requestDto = RequestDto.builder()
                 .id(1L)
                 .description("desc")
+                .created(LocalDateTime.now())
                 .build();
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(user));
@@ -138,6 +139,7 @@ public class RequestServiceTest {
         requestDto = RequestDto.builder()
                 .id(1L)
                 .description("desc")
+                .created(LocalDateTime.now())
                 .build();
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(user));

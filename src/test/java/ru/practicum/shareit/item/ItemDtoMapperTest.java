@@ -55,4 +55,23 @@ public class ItemDtoMapperTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    void toUpdatedTest() {
+        ItemDto dto = ItemDto.builder()
+                .available(true)
+                .name("name")
+                .description("description")
+                .build();
+        Item expected = Item.builder()
+                .available(true)
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .owner(1L)
+                .build();
+
+        Item actual = ItemMapper.toUpdatedItem(1L, ItemMapper.toItemDto(expected), dto);
+
+        assertEquals(expected, actual);
+    }
+
 }

@@ -20,8 +20,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -112,5 +111,19 @@ public class RequestControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(request.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(request.getDescription())));
+    }
+
+    @SneakyThrows
+    @Test
+    void getAllTest() {
+        when(requestService.findAllRequests(anyLong(), anyInt(), anyInt()))
+                .thenReturn(List.of(RequestMapper.toExtendedRequest(request)));
+        mockMvc.perform(get("/requests/all")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1L))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.[0].id", is(request.getId()), Long.class))
+                .andExpect(jsonPath("$.[0].description", is(request.getDescription())));
     }
 }

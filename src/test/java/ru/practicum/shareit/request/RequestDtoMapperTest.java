@@ -38,9 +38,11 @@ public class RequestDtoMapperTest {
     void toItemRequestTest() {
         RequestDto dto = RequestDto.builder()
                 .description("desc")
+                .created(LocalDateTime.now())
                 .build();
         Request expected = Request.builder()
                 .description("desc")
+                .created(dto.getCreated())
                 .build();
 
         Request actual = RequestMapper.toRequest(dto);

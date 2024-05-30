@@ -83,7 +83,7 @@ public class ItemRepositoryTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void getByTextTest() {
+    void getByTextInNameTest() {
         Item received = itemRepository.findByNameContainingIgnoreCase("item").get(0);
 
         assertEquals(item.getId(), received.getId());
@@ -112,4 +112,16 @@ public class ItemRepositoryTest {
         assertEquals(item.getDescription(), received.getDescription());
         assertEquals(item.getAvailable(), received.getAvailable());
     }
+
+    @Test
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+    void getByTextInDescriptionTest() {
+        Item received = itemRepository.findByNameContainingIgnoreCase("desc").get(0);
+
+        assertEquals(item.getId(), received.getId());
+        assertEquals(item.getName(), received.getName());
+        assertEquals(item.getDescription(), received.getDescription());
+        assertEquals(item.getAvailable(), received.getAvailable());
+    }
+
 }
