@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.model;
+package ru.practicum.shareit.request.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,21 +13,16 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @Entity
-@Table(name = "BOOKINGS")
+@Table(name = "REQUESTS")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Booking {
+public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "START_TIME", nullable = false)
-    private LocalDateTime start;
-    @Column(name = "END_TIME", nullable = false)
-    private LocalDateTime end;
+    @Column
+    private String description;
+    private LocalDateTime created;
     @ManyToOne
-    private Item item;
-    @ManyToOne
-    private User booker;
-    @Enumerated(EnumType.STRING)
-    private BookingStatus status;
+    private User user;
 }

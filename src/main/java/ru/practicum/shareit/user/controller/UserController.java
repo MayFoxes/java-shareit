@@ -11,7 +11,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
@@ -24,19 +24,19 @@ public class UserController {
         return userService.createUser(userDto);
     }
 
-    @DeleteMapping(path = "/{userId}")
+    @DeleteMapping("/{userId}")
     public void deleteUser(@Valid @PathVariable Long userId) {
         log.info("A try to delete a user with id:{}", userId);
         userService.deleteUser(userId);
     }
 
-    @PatchMapping(path = "/{userId}")
+    @PatchMapping("/{userId}")
     public User updateUser(@PathVariable Long userId, @Valid @RequestBody UserDto userDto) {
         log.info("User with id:{} trying to update themself", userId);
         return userService.updatedUser(userId, userDto);
     }
 
-    @GetMapping(path = "/{userId}")
+    @GetMapping("/{userId}")
     public UserDto findUser(@Valid @PathVariable Long userId) {
         log.info("Searching user with id:{}", userId);
         return userService.findUserById(userId);

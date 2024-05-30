@@ -7,10 +7,10 @@ import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.dto.CommentExtendedDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemExtendedDto;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -22,14 +22,15 @@ public class ItemController {
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public Item saveItem(
-            @RequestHeader(USER_ID_HEADER) Long ownerId, @Valid @RequestBody ItemDto itemDto) {
-        Item tempItem = itemService.saveItem(ownerId, itemDto);
-        log.info("A try to create a new item with id:{} by user with id:{}", tempItem, ownerId);
+    public ItemExtendedDto saveItem(
+            @RequestHeader(USER_ID_HEADER) Long ownerId,
+            @Valid @RequestBody ItemDto itemDto) {
+        ItemExtendedDto tempItem = itemService.saveItem(ownerId, itemDto);
+        log.info("A try to create a new item:{}, by user with id:{}", tempItem, ownerId);
         return tempItem;
     }
 
-    @GetMapping(path = "/{itemId}")
+    @GetMapping("/{itemId}")
     public ItemExtendedDto findItemById(
             @RequestHeader(USER_ID_HEADER) Long ownerId, @PathVariable Long itemId) {
         log.info("User requested item by id:{}", itemId);
@@ -37,18 +38,22 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemExtendedDto> findItemsByName(@RequestParam String text) {
+    public List<ItemExtendedDto> findItemsByName(@RequestParam String text,
+                                                 @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
+                                                 @RequestParam(value = "size", required = false, defaultValue = "10") @PositiveOrZero Integer size) {
         log.info("User search item by name:{}", text);
-        return itemService.findItemsByName(text);
+        return itemService.findItemsByName(text, from, size);
     }
 
     @GetMapping
-    public List<ItemExtendedDto> findItemByOwner(@RequestHeader(USER_ID_HEADER) Long ownerId) {
+    public List<ItemExtendedDto> findItemByOwner(@RequestHeader(USER_ID_HEADER) Long ownerId,
+                                                 @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
+                                                 @RequestParam(value = "size", required = false, defaultValue = "10") @PositiveOrZero Integer size) {
         log.info("User search their items");
-        return itemService.findItemsByOwner(ownerId);
+        return itemService.findItemsByOwner(ownerId, from, size);
     }
 
-    @PatchMapping(path = "/{itemId}")
+    @PatchMapping("/{itemId}")
     public ItemExtendedDto updateItem(
             @RequestHeader(USER_ID_HEADER) Long ownerId,
             @PathVariable Long itemId,

@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingExtendedDto;
@@ -11,11 +12,13 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.UnsupportedStateException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/bookings")
+@RequestMapping("/bookings")
 @AllArgsConstructor
+@Validated
 @Slf4j
 public class BookingController {
     private final BookingService bookingService;
@@ -46,10 +49,12 @@ public class BookingController {
 
     @GetMapping
     public List<BookingExtendedDto> findUserBookings(@RequestHeader(USER_ID_HEADER) Long userId,
+                                                     @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
+                                                     @RequestParam(value = "size", required = false, defaultValue = "10") @PositiveOrZero Integer size,
                                                      @RequestParam(defaultValue = "ALL") String state) {
         log.info("Request to receive user:{} bookings.", userId);
         try {
-            return bookingService.getUserBookings(userId, BookingState.valueOf(state));
+            return bookingService.getUserBookings(userId, BookingState.valueOf(state), from, size);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStateException("Unknown state: " + state);
         }
@@ -57,10 +62,12 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingExtendedDto> findByItemOwnerBookings(@RequestHeader(USER_ID_HEADER) Long userId,
+                                                            @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
+                                                            @RequestParam(value = "size", required = false, defaultValue = "10") @PositiveOrZero Integer size,
                                                             @RequestParam(defaultValue = "ALL") String state) {
         log.info("Request to receive item owner:{} bookings.", userId);
         try {
-            return bookingService.getItemOwnerBookings(userId, BookingState.valueOf(state));
+            return bookingService.getItemOwnerBookings(userId, BookingState.valueOf(state), from, size);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStateException("Unknown state: " + state);
         }
