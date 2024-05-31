@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = ShareItApp.class)
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class BookingServiceTest {
+class BookingServiceTest {
     @Mock
     private BookingRepository bookingRepository;
     @Mock

@@ -10,7 +10,7 @@ import ru.practicum.shareit.user.model.User;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class UserDtoMapperTest {
+class UserDtoMapperTest {
     @Test
     void toDtoTest() {
         User user = User.builder()

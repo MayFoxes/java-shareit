@@ -10,6 +10,7 @@ import ru.practicum.shareit.item.dto.ItemExtendedDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -39,16 +40,16 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemExtendedDto> findItemsByName(@RequestParam String text,
-                                                 @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
-                                                 @RequestParam(value = "size", required = false, defaultValue = "10") @PositiveOrZero Integer size) {
+                                                 @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                 @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("User search item by name:{}", text);
         return itemService.findItemsByName(text, from, size);
     }
 
     @GetMapping
     public List<ItemExtendedDto> findItemByOwner(@RequestHeader(USER_ID_HEADER) Long ownerId,
-                                                 @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
-                                                 @RequestParam(value = "size", required = false, defaultValue = "10") @PositiveOrZero Integer size) {
+                                                 @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                 @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("User search their items");
         return itemService.findItemsByOwner(ownerId, from, size);
     }

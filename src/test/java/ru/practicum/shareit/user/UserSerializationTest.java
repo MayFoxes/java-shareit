@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @JsonTest
-public class UserSerializationTest {
+class UserSerializationTest {
     @Autowired
     private JacksonTester<UserDto> toJsonTester;
     @Autowired

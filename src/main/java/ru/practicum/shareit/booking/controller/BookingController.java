@@ -12,6 +12,7 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.UnsupportedStateException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -49,8 +50,8 @@ public class BookingController {
 
     @GetMapping
     public List<BookingExtendedDto> findUserBookings(@RequestHeader(USER_ID_HEADER) Long userId,
-                                                     @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
-                                                     @RequestParam(value = "size", required = false, defaultValue = "10") @PositiveOrZero Integer size,
+                                                     @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                     @RequestParam(defaultValue = "10") @Positive Integer size,
                                                      @RequestParam(defaultValue = "ALL") String state) {
         log.info("Request to receive user:{} bookings.", userId);
         try {
@@ -62,8 +63,8 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingExtendedDto> findByItemOwnerBookings(@RequestHeader(USER_ID_HEADER) Long userId,
-                                                            @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
-                                                            @RequestParam(value = "size", required = false, defaultValue = "10") @PositiveOrZero Integer size,
+                                                            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                            @RequestParam(defaultValue = "10") @Positive Integer size,
                                                             @RequestParam(defaultValue = "ALL") String state) {
         log.info("Request to receive item owner:{} bookings.", userId);
         try {

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-public class CommentRepositoryTest {
+class CommentRepositoryTest {
     @Autowired
     private CommentRepository commentRepository;
     @Autowired

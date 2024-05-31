@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = ShareItApp.class)
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class ItemServiceTest {
+class ItemServiceTest {
 
     @Mock
     private ItemRepository itemRepository;

@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = BookingController.class)
-public class BookingControllerTest {
+class BookingControllerTest {
     @MockBean
     ItemRepository itemRepository;
     @Autowired

@@ -9,6 +9,8 @@ import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.service.RequestService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -43,9 +45,9 @@ public class RequestController {
 
     @GetMapping("/all")
     public List<RequestExtendedDto> findAllRequests(
-            @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
-            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
-            @RequestHeader(USER_ID_HEADER) Long userId) {
+            @RequestHeader(USER_ID_HEADER) Long userId,
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("User:{} requested list of requests.", userId);
         return requestService.findAllRequests(userId, from, size);
     }

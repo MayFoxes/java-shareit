@@ -12,7 +12,7 @@ import ru.practicum.shareit.request.model.Request;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class ItemDtoMapperTest {
+class ItemDtoMapperTest {
     @Test
     void toOutgoingDtoTest() {
         Item item = Item.builder()

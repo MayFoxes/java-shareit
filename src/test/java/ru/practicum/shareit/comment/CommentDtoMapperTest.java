@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class CommentDtoMapperTest {
+class CommentDtoMapperTest {
     @Test
     void toOutgoingDtoTest() {
         User user = User.builder()

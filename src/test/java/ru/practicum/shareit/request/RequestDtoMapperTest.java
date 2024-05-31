@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class RequestDtoMapperTest {
+class RequestDtoMapperTest {
     @Test
     void toOutgoingDtoTest() {
         Request request = Request.builder()

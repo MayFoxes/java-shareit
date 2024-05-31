@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = ShareItApp.class)
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class UserServiceTest {
+class UserServiceTest {
     private final UserServiceImpl userService;
     private final UserDto user = UserDto.builder()
             .id(1L)

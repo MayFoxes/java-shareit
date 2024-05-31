@@ -21,7 +21,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-public class BookingRepositoryTest {
+class BookingRepositoryTest {
     @Autowired
     private EntityManager entityManager;
     @Autowired
