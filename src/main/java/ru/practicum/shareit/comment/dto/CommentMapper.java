@@ -3,6 +3,8 @@ package ru.practicum.shareit.comment.dto;
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.comment.model.Comment;
 
+import java.time.LocalDateTime;
+
 @UtilityClass
 public class CommentMapper {
     public CommentExtendedDto toCommentDto(Comment comment) {
@@ -20,7 +22,7 @@ public class CommentMapper {
         return Comment.builder()
                 .id(commentDto.getId())
                 .text(commentDto.getText())
-                .created(commentDto.getCreated())
+                .created(commentDto.getCreated() != null ? commentDto.getCreated() : LocalDateTime.now())
                 .build();
     }
 }

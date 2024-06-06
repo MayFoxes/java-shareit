@@ -1,8 +1,10 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.EmailUniqueException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -21,7 +23,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User createUser(UserDto userDto) {
-        return userRepository.save(UserMapper.toUser(userDto));
+        try {
+            return userRepository.save(UserMapper.toUser(userDto));
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailUniqueException(String.format("Email:%s is not unique.", userDto.getEmail()));
+        }
     }
 
     @Transactional
