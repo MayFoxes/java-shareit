@@ -128,40 +128,62 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private Predicate<Booking> getFilterByState(BookingState state) {
-        return switch (state) {
-            case PAST -> booking -> booking.getEnd().isBefore(LocalDateTime.now());
-            case CURRENT -> booking -> booking.getStart().isBefore(LocalDateTime.now()) &&
-                    booking.getEnd().isAfter(LocalDateTime.now());
-            case FUTURE -> booking -> booking.getStart().isAfter(LocalDateTime.now());
-            default -> throw new ValidationException("Provided wrong state of booking.");
-        };
+        switch (state) {
+            case PAST:
+                return booking -> booking.getEnd().isBefore(LocalDateTime.now());
+            case CURRENT:
+                return booking -> booking.getStart().isBefore(LocalDateTime.now()) &&
+                        booking.getEnd().isAfter(LocalDateTime.now());
+            case FUTURE:
+                return booking -> booking.getStart().isAfter(LocalDateTime.now());
+            default:
+                throw new ValidationException("Provided wrong state of booking.");
+        }
     }
 
     private List<Booking> getBookingsByStatus(Long userId, BookingState state, Pageable page) {
+        List<Booking> bookings = new ArrayList<>();
         User user = getUserById(userId);
-        return switch (state) {
-            case ALL -> new ArrayList<>(bookingRepository.findAllByBooker(user, page));
-            case WAITING, REJECTED, CANCELLED -> {
+        switch (state) {
+            case ALL:
+                bookings = new ArrayList<>(bookingRepository.findAllByBooker(user, page));
+                break;
+            case WAITING:
+            case REJECTED:
+            case CANCELLED:
                 BookingStatus status = BookingStatus.valueOf(state.name());
-                yield new ArrayList<>(bookingRepository.findAllByBookerAndStatus(user, status, page));
-            }
-            case PAST, CURRENT, FUTURE -> bookingRepository.findAllByBooker(user, page).stream()
-                    .filter(getFilterByState(state))
-                    .collect(Collectors.toList());
-        };
+                bookings = new ArrayList<>(bookingRepository.findAllByBookerAndStatus(user, status, page));
+                break;
+            case PAST:
+            case CURRENT:
+            case FUTURE:
+                bookings = bookingRepository.findAllByBooker(user, page).stream()
+                        .filter(getFilterByState(state))
+                        .collect(Collectors.toList());
+        }
+        return bookings;
     }
 
     private List<Booking> getOwnerBookingsByStatus(Long ownerId, BookingState state, Pageable page) {
-        User user = getUserById(ownerId);
-        return switch (state) {
-            case ALL -> new ArrayList<>(bookingRepository.findAllByItemOwner(user, page));
-            case WAITING, REJECTED, CANCELLED -> {
+        List<Booking> bookings = new ArrayList<>();
+        User owner = getUserById(ownerId);
+        switch (state) {
+            case ALL:
+                bookings = new ArrayList<>(bookingRepository.findAllByItemOwner(owner, page));
+                break;
+            case WAITING:
+            case REJECTED:
+            case CANCELLED:
                 BookingStatus status = BookingStatus.valueOf(state.name());
-                yield new ArrayList<>(bookingRepository.findAllByItemOwnerAndStatus(user, status, page));
-            }
-            case PAST, CURRENT, FUTURE -> bookingRepository.findAllByItemOwner(user, page).stream()
-                    .filter(getFilterByState(state))
-                    .collect(Collectors.toList());
-        };
+                bookings = new ArrayList<>(bookingRepository.findAllByItemOwnerAndStatus(owner, status, page));
+                break;
+            case PAST:
+            case CURRENT:
+            case FUTURE:
+                bookings = bookingRepository.findAllByItemOwner(owner, page).stream()
+                        .filter(getFilterByState(state))
+                        .collect(Collectors.toList());
+        }
+        return bookings;
     }
 }
