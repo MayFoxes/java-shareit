@@ -16,7 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "and it.available = true ", nativeQuery = true)
     List<Item> findByNameContainingIgnoreCase(String nameSearch);
 
-    List<Item> findAllByOwner(User ownerId);
+    List<Item> findAllByOwnerOrderByOwner(User owner);
 
     List<Item> findAllByRequest(Request request);
 }

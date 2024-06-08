@@ -145,7 +145,7 @@ class ItemServiceTest {
                 .item(item)
                 .status(BookingStatus.APPROVED)
                 .build();
-        when(itemRepository.findAllByOwner(any()))
+        when(itemRepository.findAllByOwnerOrderByOwner(any()))
                 .thenReturn(List.of(item));
         when(bookingRepository.findAllByItemIn(any(), (Pageable) any()))
                 .thenReturn(List.of(booking));

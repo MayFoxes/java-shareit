@@ -29,10 +29,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,18 +89,18 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemExtendedDto> findItemsByOwner(Long ownerId, Integer from, Integer size) {
-        List<Item> tempItems = itemRepository.findAllByOwner(getUserById(ownerId));
+        List<Item> tempItems = itemRepository.findAllByOwnerOrderByOwner(getUserById(ownerId));
         Pagination pagination = new Pagination(from, size, Sort.by(Sort.Direction.DESC, "id"));
         Pageable page = pagination.getPageable();
 
         List<Booking> tempBookings = bookingRepository.findAllByItemIn(tempItems, page);
-        Map<Item, List<Booking>> bookingsByItems = new HashMap<>();
+        Map<Long, List<Booking>> bookingsByItems = new HashMap<>();
 
         for (Item item : tempItems) {
             List<Booking> itemBookings = tempBookings.stream()
                     .filter(booking -> booking.getItem().equals(item))
                     .collect(Collectors.toList());
-            bookingsByItems.put(item, itemBookings);
+            bookingsByItems.put(item.getId(), itemBookings);
         }
 
         List<ItemExtendedDto> itemsDto = new ArrayList<>();
@@ -114,16 +111,17 @@ public class ItemServiceImpl implements ItemService {
             dtoItem.setComments(commentRepository.findAllByItem(item));
 
             if (item.getOwner().getId().equals(ownerId)) {
-                List<Booking> bookings = bookingsByItems.get(item);
+                List<Booking> bookings = bookingsByItems.get(item.getId());
                 List<BookingItemDto> outForItemBookings = bookings.stream()
                         .map(BookingMapper::toBookingItemDto)
                         .collect(Collectors.toList());
                 dtoItem.setLastBooking(getLastBooking(outForItemBookings));
                 dtoItem.setNextBooking(getNextBooking(outForItemBookings));
+                itemsDto.add(dtoItem);
             }
-            itemsDto.add(dtoItem);
         }
-        return itemsDto;
+        return itemsDto.stream().sorted(Comparator.comparing(ItemExtendedDto::getId))
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -175,7 +173,8 @@ public class ItemServiceImpl implements ItemService {
 
     private BookingItemDto getNextBooking(List<BookingItemDto> bookingItemsDto) {
         return bookingItemsDto.stream()
-                .filter(dtoBooking -> dtoBooking.getStart().isAfter(LocalDateTime.now()) &&
+                .filter(dtoBooking -> (dtoBooking.getStart().isAfter(LocalDateTime.now()) ||
+                        dtoBooking.getStart().isEqual(LocalDateTime.now())) &&
                         dtoBooking.getStatus().equals(BookingStatus.APPROVED))
                 .findFirst()
                 .orElse(null);

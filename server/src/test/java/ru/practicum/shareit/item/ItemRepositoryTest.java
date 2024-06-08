@@ -73,7 +73,7 @@ class ItemRepositoryTest {
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getByItemOwnerTest() {
-        Item received = itemRepository.findAllByOwner(user2).get(0);
+        Item received = itemRepository.findAllByOwnerOrderByOwner(user2).get(0);
 
         assertEquals(item.getId(), received.getId());
         assertEquals(item.getName(), received.getName());
