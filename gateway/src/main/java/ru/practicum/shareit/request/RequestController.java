@@ -37,8 +37,8 @@ public class RequestController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllRequests(
-            @PositiveOrZero @RequestParam(value = "from", required = false) Integer from,
-            @Positive @RequestParam(value = "size", required = false) Integer size,
+            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+            @Positive @RequestParam(defaultValue = "10") Integer size,
             @RequestHeader(USER_ID_HEADER) Long userId
     ) {
         log.info("Request get all item requests.");
@@ -50,7 +50,7 @@ public class RequestController {
 
     @GetMapping("{requestId}")
     public ResponseEntity<Object> getRequestById(
-            @PathVariable("requestId") Long requestId,
+            @PathVariable Long requestId,
             @RequestHeader(USER_ID_HEADER) Long userId
     ) {
         log.info("Request to get item request.");

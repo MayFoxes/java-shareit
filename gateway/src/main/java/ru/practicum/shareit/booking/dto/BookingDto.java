@@ -23,9 +23,6 @@ public class BookingDto {
 
     @AssertTrue(message = "Time validation error")
     private boolean isTimeValid() {
-        if (start == null || end == null) {
-            return false;
-        }
-        return !(start.equals(end) || end.isBefore(start));
+        return start != null && end != null && end.isAfter(start);
     }
 }
