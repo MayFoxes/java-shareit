@@ -37,16 +37,16 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemExtendedDto> findItemsByName(@RequestParam String text,
-                                                 @RequestParam(defaultValue = "0") Integer from,
-                                                 @RequestParam(defaultValue = "10") Integer size) {
+                                                 @RequestParam Integer from,
+                                                 @RequestParam Integer size) {
         log.info("User search item by name:{}", text);
         return itemService.findItemsByName(text, from, size);
     }
 
     @GetMapping
     public List<ItemExtendedDto> findItemByOwner(@RequestHeader(USER_ID_HEADER) Long ownerId,
-                                                 @RequestParam(defaultValue = "0") Integer from,
-                                                 @RequestParam(defaultValue = "10") Integer size) {
+                                                 @RequestParam Integer from,
+                                                 @RequestParam Integer size) {
         log.info("User search their items");
         return itemService.findItemsByOwner(ownerId, from, size);
     }

@@ -45,12 +45,12 @@ public class BookingController {
 
     @GetMapping
     public List<BookingExtendedDto> findUserBookings(@RequestHeader(USER_ID_HEADER) Long userId,
-                                                     @RequestParam(defaultValue = "0") Integer from,
-                                                     @RequestParam(defaultValue = "10") Integer size,
-                                                     @RequestParam(defaultValue = "ALL") String state) {
+                                                     @RequestParam Integer from,
+                                                     @RequestParam Integer size,
+                                                     @RequestParam BookingState state) {
         log.info("Request to receive user:{} bookings.", userId);
         try {
-            return bookingService.getUserBookings(userId, BookingState.valueOf(state), from, size);
+            return bookingService.getUserBookings(userId, state, from, size);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStateException("Unknown state: " + state);
         }
@@ -58,12 +58,12 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingExtendedDto> findByItemOwnerBookings(@RequestHeader(USER_ID_HEADER) Long userId,
-                                                            @RequestParam(defaultValue = "0") Integer from,
-                                                            @RequestParam(defaultValue = "10") Integer size,
-                                                            @RequestParam(defaultValue = "ALL") String state) {
+                                                            @RequestParam Integer from,
+                                                            @RequestParam Integer size,
+                                                            @RequestParam BookingState state) {
         log.info("Request to receive item owner:{} bookings.", userId);
         try {
-            return bookingService.getItemOwnerBookings(userId, BookingState.valueOf(state), from, size);
+            return bookingService.getItemOwnerBookings(userId, state, from, size);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStateException("Unknown state: " + state);
         }

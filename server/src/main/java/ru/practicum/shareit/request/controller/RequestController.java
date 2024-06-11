@@ -43,8 +43,8 @@ public class RequestController {
     @GetMapping("/all")
     public List<RequestExtendedDto> findAllRequests(
             @RequestHeader(USER_ID_HEADER) Long userId,
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam Integer from,
+            @RequestParam Integer size) {
         log.info("User:{} requested list of requests.", userId);
         return requestService.findAllRequests(userId, from, size);
     }

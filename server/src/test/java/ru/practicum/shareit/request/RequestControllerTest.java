@@ -120,6 +120,8 @@ class RequestControllerTest {
                 .thenReturn(List.of(RequestMapper.toExtendedRequest(request)));
         mockMvc.perform(get("/requests/all")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .param("from", "0")
+                        .param("size", "10")
                         .header("X-Sharer-User-Id", 1L))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
